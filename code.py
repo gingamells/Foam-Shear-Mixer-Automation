@@ -76,7 +76,8 @@ rCylDrive = DigitalInOut(board.D12)
 rCylVent = DigitalInOut(board.D13)
 
 #####Pin Inputs/Outputs
-
+#MFC
+mfc = AnalogIn(board.A1)
 #Buttons and Lights
 gb.direction = Direction.INPUT
 gb.pull = Pull.UP
@@ -118,18 +119,6 @@ def AllClose():
     rCylDrive.value = False
     rCylVent.value = False
 
-def VentClose():
-    bCylVent.value = False
-    gCylVent.value = False
-    yCylVent.value = False
-    rCylVent.value = False
-
-def DriveClose():
-    bCylDrive.value = False
-    gCylDrive.value = False
-    yCylDrive.value = False
-    rCylDrive.value = False
-
 def SysStart():
     textPrompta = label.Label(font,text="Initializing",color=0XFFFFFF)
     textPrompta.x = 0
@@ -139,7 +128,7 @@ def SysStart():
     gl.value = True
     yl.value = True
     rl.value = True
-    AllOpen()
+    AllClose()
     time.sleep(1)
     gl.value = False
     yl.value = False
@@ -447,7 +436,11 @@ def SingleCylDrive(cylStatus, cylColor):
 
     #print(f"Driving {cylColor[driveSelect]} into {cylColor[ventSelect]}.")
 
-    while gb.value == True:                             #temporarily using yb as trigger to complete drive
+    #time.sleep(3) #wait 3 seconds for system to adjust after switching to new cylinder to prevent instantly triggering next cylinder
+    running = True
+
+    while running == True and gb.value == True:                             #temporarily using yb as trigger to complete drive
+        print("mfc value: ", mfc.value)
         if ventSelect == 0:
             bCylVent.value = True
             vPrompt = label.Label(font,text="V",color=0X000000)
@@ -511,7 +504,11 @@ def SingleCylDrive(cylStatus, cylColor):
         if yb.value == False:
             Pause()
             time.sleep(0.25)
-        time.sleep(0.25)
+
+
+        time.sleep(2)
+        if mfc.value < 55000:           #Adjust this value to change cycle trigger
+            running = False
 
     cylStatus[ventSelect] = 2
     if partialDrive == True:
@@ -525,7 +522,7 @@ def SingleCylDrive(cylStatus, cylColor):
 def EStop():
     AllClose()
     rl.value = True
-    #print("Mixing has terminated!")
+    print("Emergency Stop Activated!")
     sys.exit(0)                                 #Terminates code and exits run (delete/comment out if code should run and be reactivated with button push)
     return
 
@@ -540,7 +537,10 @@ startPrompt = label.Label(font,text="Sys Standby",color=0XFFFFFF)
 startPrompt.x = 0
 startPrompt.y = 63
 display.show(startPrompt)
-#print("System Ready for Cycle Setup")
+print("System Ready for Cycle Setup")
+#AllOpen()
+#time.sleep(5)
+AllClose()
 time.sleep(1)
 
 while True:
@@ -548,6 +548,7 @@ while True:
     gl.value = True
     yl.value = False
     rl.value = False
+
     while gb.value == True:
         tmpPrompt = label.Label(font,text="Sys Standby",color=0XFFFFFF)
         tmpPrompt.x = 0
@@ -556,6 +557,7 @@ while True:
         gl.value = not gl.value
         yl.value = not yl.value
         time.sleep(0.25)
+        #print("MFC Value: ", mfc.value)
 
     if gb.value == False:
         gl.value = not gb.value
