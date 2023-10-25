@@ -16,4 +16,11 @@ TBD
 TBD
 
 **Features:** 
-TBD
+1- Autostart
+	The AutoFOAM program runs on boot.
+	To stop this feature temporarily, execute: "sudo systemctl stop autoFOAM"
+	To disable this feature on next boot, type in the terminal: "sudo systemctl disable AutoFOAM.service".
+	To check on the status & errors of the autostart service type in "sudo systemctl status AutoFOAM.service". Press Ctrl-C to exit status.
+	To modify the autostart feature (i.e. execute a different python script, modify restart ability or frequency, change monitor), execute the following "sudo nano /etc/systemd/system/AutoFOAM.service" then reboot by executing "sudo reboot"
+	Currently the Autostart is set to execute the program living in /home/pi/AF/GUI.py
+	
